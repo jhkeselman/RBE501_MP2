@@ -1,4 +1,4 @@
-function [S,M] = make_kinematics_model()
+function [S,M] = make_kinematics_model(robot)
 % MAKE_KINEMATICS_MODEL Calculates the Screw Axes and Home Configuration of
 % the robot.
 %
@@ -17,10 +17,8 @@ S = [0 0 1 0 0 0;
      0 0 1 0 0 0]';
 
 % Home configuration
-R_home = [1 0 0; 
-          0 1 0; 
-          0 0 1]';
-t_home = [0 0 0.078]';
-M = [R_home t_home; 0 0 0 1];
+M = double(robot.fkine(zeros(1,6)));
 
 end
+
+%% Should all be good. using RVC tools for home config, screw axes from joints in URDF

@@ -1,6 +1,6 @@
-function [S,M] = make_kinematics_model(robot)
+function [S,M] = make_kinematics_model()
 % MAKE_KINEMATICS_MODEL Calculates the Screw Axes and Home Configuration of
-% the UR5 robot.
+% the robot.
 %
 % Inputs: robot - the robot object created by the robotics toolbox
 %
@@ -9,13 +9,18 @@ function [S,M] = make_kinematics_model(robot)
 
 % Screw Axes
 S = [0 0 1 0 0 0;
-     0 -1 0 -cross([0 -1 0], [0 0 0.089459]);
-     0 -1 0 -cross([0 -1 0], [-0.425 0 0.089459]);
-     0 -1 0 -cross([0 -1 0], [-0.8173 0 0.089459]);
-     0 0 -1 -cross([0 0 -1], [-0.8173 -0.10915 0]);
-     0 -1 0 -cross([0 -1 0], [-0.8173 0 -0.0052])]';
+     0 -1 0 0.2 0 0;
+     0 0 1 0 0 0;
+     0 1 0 -0.2 0 0;
+     0 0 1 0 0 0;
+     0 -1 0.19 0 0 0;
+     0 0 1 0 0 0]';
 
 % Home configuration
-M = double(robot.fkine(zeros(1,6)));
+R_home = [1 0 0; 
+          0 1 0; 
+          0 0 1]';
+t_home = [0 0 0.078]';
+M = [R_home t_home; 0 0 0 1];
 
 end

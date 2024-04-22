@@ -24,20 +24,14 @@ function [jointPos, jointVel, jointAcc, jointTau] = move_robot(params)
     dt = 1e-3;       % time step [s]
     t  = 0 : dt : 0.3; % total time [s]
 
-    params_traj.t = [0 t(end)]; % start and end time of each movement step
-    params_traj.time_step = dt;
-    params_traj.q = [params.q q];
-    params_traj.v = [0 0];
-    params_traj.a = [0 0];
-    traj = make_trajectory('quintic', params_traj);
-    % Generate the joint profiles (position, velocity, and
-    % acceleration)
-    jointPos_prescribed = traj.q;
-    jointVel_prescribed = traj.v;
-    jointAcc_prescribed = traj.a;
-
-    jointPos = jointPos_prescribed;
-    jointVel = jointVel_prescribed;
-    jointAcc = jointAcc_prescribed;
-    jointTau = tau_prescribed;
+    % Initialize the arrays where we will accumulate the output of the robot
+    % dynamics
+    jointPos_prescribed = zeros(n,size(t,2)); % Joint Variables (Prescribed)
+    jointVel_prescribed = zeros(n,size(t,2)); % Joint Velocities (Prescribed)
+    jointAcc_prescribed = zeros(n,size(t,2)); % Joint Accelerations (Prescribed)
+    tau_prescribed      = zeros(n,size(t,2)); % Joint Torques
+    jointPos = [];
+    jointVel = [];
+    jointAcc = [];
+    jointTau = [];
 end

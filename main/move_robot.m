@@ -38,6 +38,7 @@ function [jointPos, jointVel, jointAcc, jointTau] = move_robot(params)
 
     jointPos_actual = zeros(n,size(t,2)); % Joint Variables (Actual)
     jointVel_actual = zeros(n,size(t,2)); % Joint Velocities (Actual)
+    jointAcc_actual = zeros(n, size(t,2)); % Joint Accelerations (Actual)
 
     % For each joint
     for i = 1 : n
@@ -92,6 +93,7 @@ function [jointPos, jointVel, jointAcc, jointTau] = move_robot(params)
 
         % Integrate the joint accelerations to get velocity and
         % position
+        jointAcc_actual(:,i+1) = jointAcc;
         jointVel_actual(:,i+1) = dt * jointAcc + jointVel_actual(:,i);
         jointPos_actual(:,i+1) = dt * jointVel_actual(:,i) + jointPos_actual(:,i);
     end
@@ -102,7 +104,7 @@ function [jointPos, jointVel, jointAcc, jointTau] = move_robot(params)
     jointPos_acc = [jointPos_acc jointPos_actual];
     t_acc = [t_acc t+t(end)*(jj-1)];
 
-    jointPos = [];
-    jointVel = [];
-    jointAcc = [];
-    jointTau = [];
+    jointPos = jointPos_actual;
+    jointVel = jointVel_actual;
+    jointAcc = jointAcc_actual;
+    jointTau = tau_acc;

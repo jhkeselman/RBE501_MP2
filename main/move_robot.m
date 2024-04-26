@@ -1,4 +1,8 @@
-function R = move_robot(params)
+function tau = move_robot(params)
+% This will take in a set of parameters from the GUI including the robot,
+% the desired pose and wrench, and returns all the relevant info for
+% plotting the robot and the graphs. we can probably move this to live in
+% the GUI if we want (or just keep it here for visual ease)
     x = params.x;
     y = params.y;
     z = params.z;
@@ -11,11 +15,5 @@ function R = move_robot(params)
     lz = params.lz;
     lroll = params.lroll;
     lpitch = params.lpitch;
-    lyaw = params.lyaw;
-    robot = make_robot();
-    q1 = [x y z roll pitch yaw 0];
-    q2 = [lx ly lz lroll lpitch lyaw 0];
-    q = [q1' q2'];
-    robot.plot(q(:,1:2:end)');
-    R = [];
+    tau = [];
 end

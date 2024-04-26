@@ -12,10 +12,6 @@ function R = move_robot(params)
     lroll = params.lroll;
     lpitch = params.lpitch;
     lyaw = params.lyaw;
-    robot = make_robot();
-    q1 = [x y z roll pitch yaw 0];
-    q2 = [lx ly lz lroll lpitch lyaw 0];
-    q = [q1' q2'];
-    robot.plot(q(:,1:2:end)');
+    lrobot = make_robot();
     R = [];
 end

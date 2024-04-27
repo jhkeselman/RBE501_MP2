@@ -8,20 +8,19 @@ function [S,M] = make_kinematics_model(robot)
 %         M - homogeneous transformation representing the home configuration
 
 % Screw Axes
-% S = [0 0 1 0 0 0;
-%      0 -1 0 0.2 0 0;
-%      0 0 1 0 0 0;
-%      0 1 0 -0.2 0 0;
-%      0 0 1 0 0 0;
-%      0 -1 0.19 0 0 0;
-%      0 0 1 0 0 0]';
+S = [0 0 1 0 0 0;
+     0 -1 0 0.2 0 0;
+     0 0 1 0 0 0;
+     0 1 0 -0.2 0 0;
+     0 0 1 0 0 0;
+     0 -1 0.19 0 0 0;
+     0 0 1 0 0 0]';
 
 S(:, 1) = [0 0 1 0 0 0];  % As per usual
 S(:, 2) = axisOffset2screw([0 -1 0]', [0 0 0]');
 S(:, 3) = axisOffset2screw([0 -1 0]', [0 0 0.4318]');
-S(:, 4) = axisOffset2screw([-1 0 0]', [0 -0.15005 0.4318+0.0203]');
-S(:, 5) = axisOffset2screw([0 -1 0]', [-0.4318 0 0.4318+0.0203]');
-S(:, 6) = axisOffset2screw([-1 0 0]', [0 -0.15005 0.4318+0.0203]');
+S(:, 4) = axisOffset2screw([-1 0 0]', [0 -0.0203 0.4318 + 0.15005]');
+S(:, 5) = axisOffset2screw([0 -1 0]', [0.4318 ])
 
 % Home configuration
 M = double(robot.fkine(zeros(1,6)));

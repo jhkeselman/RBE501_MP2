@@ -12,6 +12,5 @@ function robot = make_robot()
 %% Create the manipulator
 mdl_LWR;
 robot = LWR;
-fprintf("test");
 end
 

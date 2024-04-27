@@ -10,12 +10,7 @@ function robot = make_robot()
 
 %% Using RVC Tools so hopefully this works with the URDF we have
 %% Create the manipulator
-% mdl_LWR;
-% robot = LWR;
-
-mdl_puma560
-robot = p560
-robot.offset = [0 pi/2 0 0 0 0 0]';
-fprintf("test");
+mdl_LWR;
+robot = LWR;
 end
 

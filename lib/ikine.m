@@ -19,7 +19,7 @@ function q = ikine(S, M, q_current, target_P)
         % starting_lambda = 10;
         starting_lambda = 1;
         lambda = starting_lambda;
-        while norm(P_current - P_d) > 0.0001 && iterations < 50000
+        while norm(P_current - P_d) > 0.0001 && iterations < 10000
             iterations = iterations + 1;
             % Calculate Jacobian
             J = jacob0(S, q_current);
@@ -28,12 +28,19 @@ function q = ikine(S, M, q_current, target_P)
             delta_q = J' * pinv(J * J' + lambda * eye(size(J))) * (P_d - P_current);
 
             % Reject step if delta is too large
-            if norm(delta_q) > 0.1
+            % if norm(delta_q) > 0.1
+            if norm(delta_q) > 0.2
                 'Rejecting step';
                 lambda = lambda * 1.5;
                 q_current;
             else
                 q_current = q_current + delta_q';
+            end
+            % 
+            % If delta is absurdly small, decrease lambda
+            if norm(delta_q) < 1e-5
+                'Decreasing lambda';
+                lambda = lambda * 0.9;
             end
             
     
@@ -54,6 +61,8 @@ function q = ikine(S, M, q_current, target_P)
             % again
             q_current = pi * rand(1, 6) - pi / 2;
             "Going again"
+            dist = norm(P_current - P_d)
+            norm_delta = norm(delta_q)
         end
     end
     

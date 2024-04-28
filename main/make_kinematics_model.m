@@ -18,10 +18,10 @@ function [S,M] = make_kinematics_model(robot)
 
 S(:, 1) = [0 0 1 0 0 0];  % As per usual
 S(:, 2) = axisOffset2screw([0 -1 0]', [0 0 0]');
-S(:, 3) = axisOffset2screw([0 -1 0]', [0 0 0.4318]');
-S(:, 4) = axisOffset2screw([-1 0 0]', [0 -0.15005 0.4318+0.0203]');
-S(:, 5) = axisOffset2screw([0 -1 0]', [-0.4318 0 0.4318+0.0203]');
-S(:, 6) = axisOffset2screw([-1 0 0]', [0 -0.15005 0.4318+0.0203]');
+S(:, 3) = axisOffset2screw([0 -1 0]', [0.4318 0 0]');
+S(:, 4) = axisOffset2screw([0 0 1]', [0.4318+0.0203 -0.15005 0]');
+S(:, 5) = axisOffset2screw([0 -1 0]', [0.4318+0.0203 0 0.4318]');
+S(:, 6) = axisOffset2screw([0 0 1]', [0.4318+0.0203 -0.15005 0]');
 
 % Home configuration
 M = double(robot.fkine(zeros(1,6)));

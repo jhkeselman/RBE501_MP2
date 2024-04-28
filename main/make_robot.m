@@ -13,6 +13,5 @@ function robot = make_robot()
 
 mdl_puma560;
 robot = p560;
-robot.offset = [0 pi/2 0 0 0 0];
 end
 

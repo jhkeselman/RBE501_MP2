@@ -8,6 +8,17 @@ function [Mlist,Glist] = make_dynamics_model()
 
 %% Should be right number of links, but no clue how to get these actual values
 % Link poses when the robot is in the home configuration
+% The URDF file describes a robot with the first joint mounted on top of a
+% tower. The tower doesn't rotate, it just wears the rest of the robot as a
+% hat. Our representation has the first two joints at the origin, so we
+% need to translate down by 0.664 m. We also put our robot in a different
+% starting orientation than the URDF, so we need to apply a rotation of
+% pi/2 about joint 2.  
+
+% Link 1:
+M1 = eye(3)
+% Transformation step 1: Translate link down by 0.664m
+
 M01 = [1 0 0 0;
        0 1 0 0;
        0 0 1 0;

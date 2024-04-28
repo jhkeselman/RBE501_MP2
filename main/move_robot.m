@@ -1,4 +1,4 @@
-function tau = move_robot(params)
+function tau = move_robot(robot, params)
 % This will take in a set of parameters from the GUI including the robot,
 % the desired pose and wrench, and returns all the relevant info for
 % plotting the robot and the graphs. we can probably move this to live in

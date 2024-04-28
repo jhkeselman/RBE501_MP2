@@ -6,7 +6,6 @@ function [Mlist,Glist] = make_dynamics_model(robot)
 % Output: Mlist - 4x4x7 matrix containing all the transformation matrices between consecutive link frames
 %         Glist - 6x6x6 matrix containing the spatial inertia matrices of each link
 
-%% Should be right number of links, but no clue how to get these actual values
 % Link poses when the robot is in the home configuration
 % The URDF file describes a robot with the first joint mounted on top of a
 % tower. The tower doesn't rotate, it just wears the rest of the robot as a

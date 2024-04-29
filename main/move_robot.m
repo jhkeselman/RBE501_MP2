@@ -17,33 +17,9 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
     [Mlist,Glist] = make_dynamics_model(robot);
     g = [0 0 -9.81]';
 
-    
-    targetCoords = targetPt(1:3)'; % [x y z]
-
-    % currentCoords = fkine(S,M,currentQ,'space');
-    % currentCoords = currentCoords(1:3,4);
-
-    currentCoords_ = robot.fkine(currentQ);
-    currentCoords = currentCoords_.t; % extract points
-    currentQ_ = currentQ; % store current position
-    error = targetCoords - currentCoords;
-    lambda = 0.1;
-    count = 0;
-    while norm(error) > 1e-3 && count < 2000
-        J_a = jacoba(S,M,currentQ_);
-        % deltaQ = pinv(J_a) * error; % pseudoinverse
-        deltaQ = J_a' * pinv(J_a * J_a' + lambda^2 * eye(3)) * error; % DLS
-        % alpha = dot(error,J_a*J_a'*error)/dot(J_a*J_a'*error,J_a*J_a'*error);
-        % deltaQ = alpha * J_a' * error; % transpose
-        currentQ_ = currentQ_ + deltaQ';
-        % currentCoords = fkine(S,M,currentQ_,'space');
-        % currentCoords = currentCoords(1:3,4);
-        currentCoords_ = robot.fkine(currentQ_);
-        currentCoords = currentCoords_.t; % extract points
-        error = targetCoords - currentCoords;
-        count = count + 1;
-    end
-    targetQ = [currentQ_(1:3) targetPt(4:6)];
+    targetRot = rpy2r(targetPt(4), targetPt(5), targetPt(6), 'deg');
+    targetPose = [targetRot, targetPt(1:3)'; 0 0 0 1]
+    targetQ = ikine(S, M, currentQ, targetPose);
 
     tau_acc = [];
     jointPos_acc = [];
@@ -51,11 +27,6 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
     jointAcc_actual = [];
     jointVel_actual = [];
     jointPos_actual = [];
-
-    if count == 2000
-        disp("Error: entered target coordinate out of range");
-        return
-    end
        
     % Initialize the time vector
     dt = 1e-3;       % time step [s]
@@ -111,8 +82,11 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
         params_rne.jointAcc = jointAcc_prescribed(:,ii);
         % params_rne.Ftip = zeros(6,1); % end effector wrench
         T = fkine(S,M,params_rne.jointPos,'space');
-        Ftip_inS = [cross(T(1:3,4),-g);-g*force];
-        params_rne.Ftip = adjoint(T)' * Ftip_inS;
+        Ftip = -g*force;
+        Mtip = skew(M(1:3,4))*Ftip;
+        wrench = [Mtip', Ftip']';
+        Wrench_in_ee = adjoint(M)'*wrench;
+        params_rne.Ftip = Wrench_in_ee;
         tau_prescribed(:,ii) = rne(params_rne);
 
         % Feed the torques to the forward dynamics model and perform one

@@ -11,6 +11,7 @@ function [Mlist,Glist] = make_dynamics_model(robot)
 % tower. The tower doesn't rotate, it just wears the rest of the robot as a
 % hat. Our representation has the first two joints at the origin, so we
 % need to translate down by 0.664 m.
+%% The URDF can be found here: http://open-robotics.com/tag/urdf/?ckattempt=2
 
 % % Link 1:
 % % We ignore the 0.664 m vertical offset and define this frame at our origin

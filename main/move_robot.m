@@ -7,8 +7,8 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
     % vel = [];
     % acc = [];
     % tau = [];
-    % t_ = [];
-
+    % t_ = [];  
+    addpath('../lib');
     % Create a kinematic model of the robot
     [S,M] = make_kinematics_model(robot);
     n = size(S,2); % read the number of joints

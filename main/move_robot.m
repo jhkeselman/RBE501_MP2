@@ -19,8 +19,9 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
 
     
     targetCoords = targetPt(1:3)'; % [x y z]
-    currentCoords = fkine(S,M,currentQ,'space');
-    currentCoords = currentCoords(1:3,4);
+    currentCoords_ = robot.fkine(currentQ);
+    % currentCoords = fkine(S,M,currentQ,'space');
+    currentCoords = currentCoords_.t; % extract points
     currentQ_ = currentQ; % store current position
     error = targetCoords - currentCoords;
     lambda = 0.1;
@@ -32,8 +33,9 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
         % alpha = dot(error,J_a*J_a'*error)/dot(J_a*J_a'*error,J_a*J_a'*error);
         % deltaQ = alpha * J_a' * error; % transpose
         currentQ_ = currentQ_ + deltaQ';
-        currentCoords = fkine(S,M,currentQ_,'space');
-        currentCoords = currentCoords(1:3,4);
+        % currentCoords = fkine(S,M,currentQ_,'space');
+        currentCoords_ = robot.fkine(currentQ_);
+        currentCoords = currentCoords_.t; % extract points
         error = targetCoords - currentCoords;
         count = count + 1;
     end

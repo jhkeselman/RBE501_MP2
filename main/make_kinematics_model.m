@@ -16,6 +16,8 @@ function [S,M] = make_kinematics_model(robot)
 %      0 -1 0.19 0 0 0;
 %      0 0 1 0 0 0]';
 
+addpath("lib");
+
 S(:, 1) = [0 0 1 0 0 0];  % As per usual
 S(:, 2) = axisOffset2screw([0 -1 0]', [0 0 0]');
 S(:, 3) = axisOffset2screw([0 -1 0]', [0.4318 0 0]');

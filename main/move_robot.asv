@@ -1,0 +1,25 @@
+function [pos, vel, acc, tau, t] = move_robot(robot, currentQ, targetPt, force)
+    % Takes in the robot, the current joints and the target points. charts the
+    % path between the two (vectors for position, velocity, acceleration, 
+    % torque, and time)
+
+    pos = [];
+    vel = [];
+    acc = [];
+    tau = [];
+    t = [];
+
+    % Create a kinematic model of the robot
+    [S,M] = make_kinematics_model();
+    n = size(S,2); % read the number of joints
+    
+    % Create a dynamical model of the robot
+    [Mlist,Glist] = make_dynamics_model();
+
+    nPts = 2;
+    waypoints = zeros(n,nPts);
+    path = robot.fki
+
+
+
+end

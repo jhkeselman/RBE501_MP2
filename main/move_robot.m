@@ -8,7 +8,7 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
     % acc = [];
     % tau = [];
     % t_ = [];  
-    addpath('../lib');
+    % addpath('../lib');
     % Create a kinematic model of the robot
     [S,M] = make_kinematics_model(robot);
     n = size(S,2); % read the number of joints
@@ -19,8 +19,12 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
 
     
     targetCoords = targetPt(1:3)'; % [x y z]
-    currentCoords = fkine(S,M,currentQ,'space');
-    currentCoords = currentCoords(1:3,4);
+
+    % currentCoords = fkine(S,M,currentQ,'space');
+    % currentCoords = currentCoords(1:3,4);
+
+    currentCoords_ = robot.fkine(currentQ);
+    currentCoords = currentCoords_.t; % extract points
     currentQ_ = currentQ; % store current position
     error = targetCoords - currentCoords;
     lambda = 0.1;
@@ -32,18 +36,21 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
         % alpha = dot(error,J_a*J_a'*error)/dot(J_a*J_a'*error,J_a*J_a'*error);
         % deltaQ = alpha * J_a' * error; % transpose
         currentQ_ = currentQ_ + deltaQ';
-        currentCoords = fkine(S,M,currentQ_,'space');
-        currentCoords = currentCoords(1:3,4);
+        % currentCoords = fkine(S,M,currentQ_,'space');
+        % currentCoords = currentCoords(1:3,4);
+        currentCoords_ = robot.fkine(currentQ_);
+        currentCoords = currentCoords_.t; % extract points
         error = targetCoords - currentCoords;
         count = count + 1;
     end
-    targetQ = currentQ_;
+    targetQ = [currentQ_(1:3) targetPt(4:6)];
 
     tau_acc = [];
     jointPos_acc = [];
     t_acc = [];
     jointAcc_actual = [];
     jointVel_actual = [];
+    jointPos_actual = [];
 
     if count == 2000
         disp("Error: entered target coordinate out of range");
@@ -70,10 +77,9 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
         % Calculate a trajectory using a quintic polynomial
         params_traj.t = [0 t(end)]; % start and end time of each movement step
         params_traj.time_step = dt;
-        params_traj.q = [currentQ targetQ];
+        params_traj.q = [currentQ(ii) targetQ(ii)];
         params_traj.v = [0 0];
         params_traj.a = [0 0];
-
         traj = make_trajectory('quintic', params_traj);
 
         % Generate the joint profiles (position, velocity, and

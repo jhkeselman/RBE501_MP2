@@ -1,4 +1,4 @@
-function [jointPos_acc, jointVel_actual, jointAcc, tau_acc, t_acc] = move_robot(robot, currentQ, targetPt, force)
+function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = move_robot(robot, currentQ, targetPt, force)
     % Takes in the robot, the current joints and the target points. charts the
     % path between the two (vectors for position, velocity, acceleration, 
     % torque, and time)
@@ -24,7 +24,8 @@ function [jointPos_acc, jointVel_actual, jointAcc, tau_acc, t_acc] = move_robot(
     currentQ_ = currentQ; % store current position
     error = targetCoords - currentCoords;
     lambda = 0.1;
-    while norm(error) > 1e-3
+    count = 0;
+    while norm(error) > 1e-3 && count < 2000
         J_a = jacoba(S,M,currentQ_);
         % deltaQ = pinv(J_a) * error; % pseudoinverse
         deltaQ = J_a' * pinv(J_a * J_a' + lambda^2 * eye(3)) * error; % DLS
@@ -34,12 +35,20 @@ function [jointPos_acc, jointVel_actual, jointAcc, tau_acc, t_acc] = move_robot(
         currentCoords = fkine(S,M,currentQ_,'space');
         currentCoords = currentCoords(1:3,4);
         error = targetCoords - currentCoords;
+        count = count + 1;
     end
     targetQ = currentQ_;
 
     tau_acc = [];
     jointPos_acc = [];
     t_acc = [];
+    jointAcc_actual = [];
+    jointVel_actual = [];
+
+    if count == 2000
+        disp("Error: entered target coordinate out of range");
+        return
+    end
        
     % Initialize the time vector
     dt = 1e-3;       % time step [s]
@@ -54,6 +63,7 @@ function [jointPos_acc, jointVel_actual, jointAcc, tau_acc, t_acc] = move_robot(
 
     jointPos_actual = zeros(n,size(t,2)); % Joint Variables (Actual)
     jointVel_actual = zeros(n,size(t,2)); % Joint Velocities (Actual)
+    jointAcc_actual = zeros(n,size(t,2)); % Joint Acceleration (Actual)
 
     % For each joint
     for ii = 1 : n
@@ -114,16 +124,29 @@ function [jointPos_acc, jointVel_actual, jointAcc, tau_acc, t_acc] = move_robot(
         % position
         jointVel_actual(:,ii+1) = dt * jointAcc + jointVel_actual(:,ii);
         jointPos_actual(:,ii+1) = dt * jointVel_actual(:,ii) + jointPos_actual(:,ii);
+        jointAcc_actual(:,ii+1) = jointAcc;
     end
 
     tau_prescribed(:,end) = tau_prescribed(:,end-1);
     
     tau_acc = [tau_acc tau_prescribed];
     jointPos_acc = [jointPos_acc jointPos_actual];
-    t_acc = [t_acc t]; % TODO
-% t_acc
-% jointPos_acc
-% jointPos_actual
-% tau_acc
+    t_acc = [t_acc t];
+% % t_acc
+% % jointPos_acc
+% % jointPos_actual
+% % tau_acc
+% figure;
+% hold on;
+% % plot(t_acc,jointPos_actual(1,:));
+% % jointPos_acc = rad2deg(jointPos_acc);
+% plot(t_acc,jointPos_acc(1,:));
+% plot(t_acc,jointPos_acc(2,:));
+% plot(t_acc,jointPos_acc(3,:));
+% % plot(t_acc,jointPos_acc(4,:));
+% % plot(t_acc,jointPos_acc(5,:));
+% % plot(t_acc,jointPos_acc(6,:));
+% legend("1","2","3","4","5","6");
+% xlabel('t(s)');
 end
 

@@ -16,8 +16,6 @@ function [S,M] = make_kinematics_model(robot)
 %      0 -1 0.19 0 0 0;
 %      0 0 1 0 0 0]';
 
-addpath("lib");
-
 S(:, 1) = [0 0 1 0 0 0];  % As per usual
 S(:, 2) = axisOffset2screw([0 -1 0]', [0 0 0]');
 S(:, 3) = axisOffset2screw([0 -1 0]', [0.4318 0 0]');
@@ -31,3 +29,10 @@ M = double(robot.fkine(zeros(1,6)));
 end
 
 %% Should all be good. using RVC tools for home config, screw axes from joints in URDF
+
+% V = AXISOFFSET2SCREW(omega, p) produces the screw axis defined by axis of
+% rotation omega and the displacement from the origin p.
+function S = axisOffset2screw(omega, p)
+    v = -skew(omega) * p;
+    S = [omega; v];
+end

@@ -18,7 +18,7 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
     g = [0 0 -9.81]';
 
     targetRot = rpy2r(targetPt(4), targetPt(5), targetPt(6), 'deg');
-    targetPose = [targetRot, targetPt(1:3)'; 0 0 0 1]
+    targetPose = [targetRot, targetPt(1:3)'; 0 0 0 1];
     targetQ = ikine(S, M, currentQ, targetPose);
 
     tau_acc = [];
@@ -27,7 +27,12 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
     jointAcc_actual = [];
     jointVel_actual = [];
     jointPos_actual = [];
-       
+    
+    % Detect IK failure
+    if isempty(targetQ)
+        return;
+    end
+
     % Initialize the time vector
     dt = 1e-3;       % time step [s]
     t  = 0 : dt : 0.5; % total time [s]
@@ -83,21 +88,18 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
         % params_rne.Ftip = zeros(6,1); % end effector wrench
         T = fkine(S,M,params_rne.jointPos,'space');
         Ftip = -g*force;
-        Mtip = skew(M(1:3,4))*Ftip;
+        Mtip = skew(T(1:3,4))*Ftip;
         wrench = [Mtip', Ftip']';
-        Wrench_in_ee = adjoint(M)'*wrench;
+        Wrench_in_ee = adjoint(T)'*wrench;
         params_rne.Ftip = Wrench_in_ee;
         tau_prescribed(:,ii) = rne(params_rne);
 
         % Feed the torques to the forward dynamics model and perform one
         % simulation step
-        params_fdyn.jointPos = jointPos_actual(:,ii);
+        params_fdyn.jointPos = jointPos_actual(:,ii);   
         params_fdyn.jointVel = jointVel_actual(:,ii);
         params_fdyn.tau = tau_prescribed(:,ii);
-        params_fdyn.Ftip = zeros(6,1); % end effector wrench
-        T = fkine(S,M,params_fdyn.jointPos,'space');
-        Ftip_inS = [cross(T(1:3,4),-g);-g*force];
-        params_fdyn.Ftip = adjoint(T)' * Ftip_inS;
+        params_fdyn.Ftip = Wrench_in_ee;
         jointAcc = fdyn(params_fdyn);
 
         % Integrate the joint accelerations to get velocity and
@@ -112,21 +114,5 @@ function [jointPos_actual, jointVel_actual, jointAcc_actual, tau_acc, t_acc] = m
     tau_acc = [tau_acc tau_prescribed];
     jointPos_acc = [jointPos_acc jointPos_actual];
     t_acc = [t_acc t];
-% % t_acc
-% % jointPos_acc
-% % jointPos_actual
-% % tau_acc
-% figure;
-% hold on;
-% % plot(t_acc,jointPos_actual(1,:));
-% % jointPos_acc = rad2deg(jointPos_acc);
-% plot(t_acc,jointPos_acc(1,:));
-% plot(t_acc,jointPos_acc(2,:));
-% plot(t_acc,jointPos_acc(3,:));
-% % plot(t_acc,jointPos_acc(4,:));
-% % plot(t_acc,jointPos_acc(5,:));
-% % plot(t_acc,jointPos_acc(6,:));
-% legend("1","2","3","4","5","6");
-% xlabel('t(s)');
 end
 

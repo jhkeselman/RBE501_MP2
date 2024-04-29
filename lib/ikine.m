@@ -60,9 +60,9 @@ function q = ikine(S, M, q_current, target_P)
             % If solution not found, pick a random starting point and go
             % again
             q_current = pi * rand(1, 6) - pi / 2;
-            "Going again"
-            dist = norm(P_current - P_d)
-            norm_delta = norm(delta_q)
+            "Going again";
+            dist = norm(P_current - P_d);
+            norm_delta = norm(delta_q);
         end
     end
     
